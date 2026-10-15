@@ -149,6 +149,102 @@ const planner = document.getElementById('planner-app');
 let plannerStep = 0;
 let plannerAnswers = [null, null, null];
 let extraContext = '';
+// Project briefs are sent to the XASIS project-brief function (Supabase Edge Function), which
+// re-checks every field, verifies Turnstile and rate-limits. Browser checks are only for convenience.
+const PROJECT_BRIEF_URL = 'https://vhulgoboqjmxljhvarur.supabase.co/functions/v1/project-brief';
+const TURNSTILE_SITE_KEY = '0x4AAAAAAFXlJKuBPcyDTJ2Q';
+let briefContact = {name: '', business_name: '', email: '', phone: '', consent: false};
+let briefSent = false;
+let briefWidgetId = null;
+const briefFieldLabels = {
+  name: 'your name', business_name: 'your business name', email: 'your email',
+  phone: 'your phone number (digits, spaces, + and dashes only)', context: 'your notes (up to 2,500 characters)',
+  consent: 'the consent box', business_type: 'the business question', problem: 'the problem question',
+  current_tools: 'the current tools question'
+};
+
+function mountBriefTurnstile(holder) {
+  let tries = 0;
+  const attempt = () => {
+    if (!holder.isConnected) return;
+    if (!window.turnstile) {
+      if (tries++ < 50) setTimeout(attempt, 200);
+      return;
+    }
+    try { if (briefWidgetId !== null) window.turnstile.remove(briefWidgetId); } catch { /* already gone */ }
+    briefWidgetId = window.turnstile.render(holder, {sitekey: TURNSTILE_SITE_KEY, theme: 'dark', action: 'project-brief'});
+  };
+  attempt();
+}
+
+function briefField(id, labelText, key, options = {}) {
+  const wrap = element('div');
+  const label = element('label', '', labelText);
+  label.htmlFor = id;
+  if (options.optional) label.append(element('span', '', ' (optional)'));
+  const input = element('input');
+  input.id = id;
+  input.name = key;
+  input.type = options.type || 'text';
+  input.maxLength = options.max;
+  input.required = !options.optional;
+  if (options.autocomplete) input.autocomplete = options.autocomplete;
+  if (options.pattern) input.pattern = options.pattern;
+  if (options.placeholder) input.placeholder = options.placeholder;
+  input.value = briefContact[key];
+  input.addEventListener('input', () => { briefContact[key] = input.value; });
+  wrap.append(label, input);
+  return wrap;
+}
+
+async function sendProjectBrief(form, status, submit) {
+  if (!form.reportValidity()) return;
+  const token = briefWidgetId !== null && window.turnstile ? window.turnstile.getResponse(briefWidgetId) : '';
+  if (!token) {
+    status.textContent = 'Please wait for the security check above the button to finish, then send again.';
+    return;
+  }
+  submit.disabled = true;
+  status.textContent = 'Sending your brief...';
+  let response = null;
+  let result = {};
+  try {
+    response = await fetch(PROJECT_BRIEF_URL, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        name: briefContact.name.trim(),
+        business_name: briefContact.business_name.trim(),
+        email: briefContact.email.trim(),
+        phone: briefContact.phone.trim(),
+        business_type: plannerSteps[0].options[plannerAnswers[0]],
+        problem: plannerSteps[1].options[plannerAnswers[1]],
+        current_tools: plannerSteps[2].options[plannerAnswers[2]],
+        context: extraContext.trim(),
+        consent: briefContact.consent,
+        website: String(new FormData(form).get('website') || ''),
+        turnstile_token: String(token)
+      })
+    });
+    result = await response.json().catch(() => ({}));
+  } catch {
+    response = null;
+  }
+  submit.disabled = false;
+  if (response && response.ok) {
+    briefSent = true;
+    renderPlanner();
+    focusPlannerHeading();
+    return;
+  }
+  try { window.turnstile?.reset(briefWidgetId); } catch { /* widget not loaded */ }
+  if (!response) status.textContent = 'We could not reach XASIS. Check your connection and try again, or email hello@xasis.app.';
+  else if (response.status === 409) status.textContent = 'We already have a brief from this email today. We will be in touch.';
+  else if (response.status === 429) status.textContent = 'Too many briefs at once. Please try again in a few minutes.';
+  else if (response.status === 400) status.textContent = `Please check ${briefFieldLabels[result.field] || 'the form'} and send again.`;
+  else if (response.status === 403) status.textContent = 'The security check did not pass. Please try again.';
+  else status.textContent = 'Something went wrong on our side. Please try again later, or email hello@xasis.app.';
+}
 
 function focusPlannerHeading() {
   const heading = planner?.querySelector('h3');
@@ -175,7 +271,7 @@ function saveProjectBrief() {
   const content = ['XASIS / FIRST PROJECT BRIEF', direction.name, '', 'A draft for discussion. Scope, budget and timing need to be agreed.', ''];
   briefRows().forEach(([label, value]) => content.push(label.toUpperCase(), value, ''));
   if (extraContext.trim()) content.push('ADDITIONAL CONTEXT', extraContext.trim(), '');
-  content.push('NEXT CONVERSATION', 'Walk through the real workflow, check whether the tools can connect, and agree a useful outcome before any build starts.', '', 'Send this brief to hello@xasis.app to start the conversation.');
+  content.push('NEXT CONVERSATION', 'Walk through the real workflow, check whether the tools can connect, and agree a useful outcome before any build starts.', '', briefSent ? 'Sent to XASIS. Questions? Email hello@xasis.app.' : 'Send this brief to hello@xasis.app to start the conversation.');
   downloadText('xasis-project-brief.txt', content.join('\n'));
   notify('Your project brief is ready to save.');
 }
@@ -184,7 +280,7 @@ function renderPlanner() {
   if (!planner) return;
   planner.replaceChildren();
   const top = element('div', 'planner-top');
-  top.append(element('span', 'tiny-label', 'XASIS / PROJECT PLANNER'), element('span', 'step-count', plannerStep < 3 ? `${plannerStep + 1} / 3` : 'Ready to save'));
+  top.append(element('span', 'tiny-label', 'XASIS / PROJECT PLANNER'), element('span', 'step-count', plannerStep < 3 ? `${plannerStep + 1} / 3` : briefSent ? 'Sent' : 'Ready to send'));
   planner.append(top);
   const progress = element('ol', 'wizard-track');
   progress.setAttribute('aria-label', 'Project brief steps');
@@ -221,21 +317,83 @@ function renderPlanner() {
     input.addEventListener('input', () => { extraContext = input.value; });
     context.append(label, input);
     result.append(context);
+    const restart = () => {
+      plannerStep = 0; plannerAnswers = [null, null, null]; extraContext = ''; briefSent = false;
+      briefContact = {name: '', business_name: '', email: '', phone: '', consent: false};
+      renderPlanner(); focusPlannerHeading();
+    };
+    if (briefSent) {
+      input.disabled = true;
+      const done = element('div', 'brief-sent');
+      done.append(element('p', 'tiny-label', 'SENT'), element('h3', '', 'Thanks, your brief is with us.'),
+        element('p', '', `We sent a copy to ${briefContact.email.trim()}. One of us will get back to you within 2 working days to set up a short call.`));
+      const doneActions = element('div', 'result-actions');
+      const copy = element('button', 'button button-dark', 'Save a copy');
+      copy.type = 'button';
+      copy.id = 'save-brief';
+      copy.insertAdjacentHTML('beforeend', arrow);
+      copy.addEventListener('click', saveProjectBrief);
+      const again = element('button', 'text-button', 'Start a new brief');
+      again.type = 'button';
+      again.addEventListener('click', restart);
+      doneActions.append(copy, again);
+      done.append(doneActions);
+      result.append(done);
+      planner.append(result);
+      return;
+    }
+    const form = element('form', 'brief-contact');
+    form.id = 'brief-contact-form';
+    form.append(element('p', 'tiny-label', 'WHERE SHOULD WE REPLY?'));
+    const row1 = element('div', 'form-grid');
+    row1.append(briefField('brief-name', 'Your name', 'name', {max: 100, autocomplete: 'name'}),
+      briefField('brief-business', 'Business name', 'business_name', {max: 120, autocomplete: 'organization'}));
+    const row2 = element('div', 'form-grid');
+    row2.append(briefField('brief-email', 'Email', 'email', {type: 'email', max: 200, autocomplete: 'email', placeholder: 'you@business.com'}),
+      briefField('brief-phone', 'Phone or WhatsApp', 'phone', {type: 'tel', max: 20, autocomplete: 'tel', optional: true, pattern: '\\+?[0-9 \\(\\)\\-]{6,20}', placeholder: '+65'}));
+    const trap = element('div', 'hp-field');
+    trap.setAttribute('aria-hidden', 'true');
+    const trapLabel = element('label', '', 'Leave this empty');
+    trapLabel.htmlFor = 'brief-website';
+    const trapInput = element('input');
+    trapInput.id = 'brief-website';
+    trapInput.name = 'website';
+    trapInput.tabIndex = -1;
+    trapInput.autocomplete = 'off';
+    trap.append(trapLabel, trapInput);
+    const consentRow = element('div', 'checkbox-row checkbox-top');
+    const consent = element('input');
+    consent.type = 'checkbox';
+    consent.id = 'brief-consent';
+    consent.required = true;
+    consent.checked = briefContact.consent;
+    consent.addEventListener('change', () => { briefContact.consent = consent.checked; });
+    const consentLabel = element('label', '', 'XASIS may store these details to reply about this project. ');
+    consentLabel.htmlFor = 'brief-consent';
+    consentLabel.append(element('span', '', 'I can ask for them to be deleted at any time.'));
+    consentRow.append(consent, consentLabel);
+    const humanCheck = element('div', 'cf-turnstile brief-turnstile');
     const actions = element('div', 'result-actions');
-    const save = element('button', 'button button-dark', 'Save my brief');
-    save.type = 'button';
-    save.id = 'save-brief';
-    save.insertAdjacentHTML('beforeend', arrow);
-    save.addEventListener('click', saveProjectBrief);
+    const send = element('button', 'button button-dark', 'Send my brief');
+    send.type = 'submit';
+    send.id = 'send-brief';
+    send.insertAdjacentHTML('beforeend', arrow);
     const back = element('button', 'text-button', 'Back');
     back.type = 'button';
     back.addEventListener('click', () => { plannerStep = 2; renderPlanner(); focusPlannerHeading(); });
     const reset = element('button', 'text-button', 'Start again');
     reset.type = 'button';
-    reset.addEventListener('click', () => { plannerStep = 0; plannerAnswers = [null, null, null]; extraContext = ''; renderPlanner(); focusPlannerHeading(); });
-    actions.append(save, back, reset);
-    result.append(actions, element('p', 'brief-fine', 'A useful starting point for a conversation. This is a draft, and no details have been sent. Email the saved brief to hello@xasis.app to start the conversation.'));
+    reset.addEventListener('click', restart);
+    actions.append(send, back, reset);
+    const status = element('p', 'brief-fine', 'You will get a copy by email. Prefer email? Write to hello@xasis.app.');
+    status.id = 'brief-status';
+    status.setAttribute('role', 'status');
+    status.setAttribute('aria-live', 'polite');
+    form.append(row1, row2, trap, consentRow, humanCheck, actions, status);
+    form.addEventListener('submit', event => { event.preventDefault(); sendProjectBrief(form, status, send); });
+    result.append(form);
     planner.append(result);
+    mountBriefTurnstile(humanCheck);
     return;
   }
 
