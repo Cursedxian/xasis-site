@@ -286,57 +286,146 @@ function renderPlanner() {
 }
 if (planner) renderPlanner();
 
-// The builder profile is prepared locally. No personal details are transmitted.
+// Builder introductions are sent to the XASIS builder-signup function (Supabase Edge Function).
+// The function re-checks every field, verifies Turnstile and rate-limits; the browser checks are only for convenience.
+const BUILDER_SIGNUP_URL = 'https://vhulgoboqjmxljhvarur.supabase.co/functions/v1/builder-signup';
 const builderForm = document.getElementById('builder-form');
 const builderSuccess = document.getElementById('builder-success');
+const builderStatus = document.getElementById('builder-status');
+const builderFieldLabels = {
+  name: 'your name', email: 'your email', country: 'where you are based', utc_offset: 'your time zone',
+  specialty: 'your main strength', example: 'your example (20 to 2,500 characters)',
+  portfolio: 'your link (it must start with https://)', availability: 'your availability',
+  human_confirmed: 'the responsibility box', consent: 'the consent box'
+};
 let builderProfile;
 
-builderForm?.addEventListener('submit', event => {
+function formatUtcOffset(minutes) {
+  const sign = minutes < 0 ? '-' : '+';
+  const abs = Math.abs(minutes);
+  const hours = Math.floor(abs / 60);
+  const mins = abs % 60;
+  return `UTC${sign}${hours}${mins ? `:${String(mins).padStart(2, '0')}` : ''}`;
+}
+
+const utcSelect = document.getElementById('builder-utc');
+if (utcSelect) {
+  const offsets = [];
+  for (let h = -12; h <= 14; h++) offsets.push(h * 60);
+  [-210, 210, 270, 330, 345, 390, 570, 630].forEach(extra => offsets.push(extra));
+  offsets.sort((a, b) => a - b);
+  const local = -new Date().getTimezoneOffset();
+  offsets.forEach(minutes => {
+    const option = document.createElement('option');
+    option.value = formatUtcOffset(minutes);
+    option.textContent = option.value === 'UTC+8' ? 'UTC+8 (Singapore, Manila, Kuala Lumpur)' : option.value;
+    if (minutes === local) option.selected = true;
+    utcSelect.append(option);
+  });
+}
+
+function setBuilderStatus(message) {
+  if (builderStatus) builderStatus.textContent = message;
+}
+
+function resetTurnstile() {
+  try { window.turnstile?.reset(); } catch { /* widget not loaded */ }
+}
+
+builderForm?.addEventListener('submit', async event => {
   event.preventDefault();
   if (!builderForm.reportValidity()) return;
-  builderProfile = Object.fromEntries(new FormData(builderForm));
+  const data = new FormData(builderForm);
+  const token = data.get('cf-turnstile-response');
+  if (!token) {
+    setBuilderStatus('Please wait for the security check above the button to finish, then send again.');
+    return;
+  }
+  builderProfile = {
+    name: String(data.get('name') || '').trim(),
+    email: String(data.get('email') || '').trim(),
+    country: String(data.get('country') || ''),
+    utc_offset: String(data.get('utc_offset') || ''),
+    specialty: String(data.get('specialty') || ''),
+    example: String(data.get('example') || '').trim(),
+    portfolio: String(data.get('portfolio') || '').trim(),
+    availability: String(data.get('availability') || '')
+  };
+  const submit = builderForm.querySelector('.form-submit');
+  submit.disabled = true;
+  setBuilderStatus('Sending your introduction...');
+  let response;
+  let result = {};
+  try {
+    response = await fetch(BUILDER_SIGNUP_URL, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        ...builderProfile,
+        human_confirmed: data.get('human_confirmed') === 'on',
+        consent: data.get('consent') === 'on',
+        website: String(data.get('website') || ''),
+        turnstile_token: String(token)
+      })
+    });
+    result = await response.json().catch(() => ({}));
+  } catch {
+    response = null;
+  }
+  submit.disabled = false;
+  if (!response) {
+    resetTurnstile();
+    setBuilderStatus('We could not reach XASIS. Check your connection and try again, or email hello@xasis.app.');
+    return;
+  }
+  if (!response.ok) {
+    resetTurnstile();
+    if (response.status === 409) setBuilderStatus('We already have an introduction from this email today. We will be in touch.');
+    else if (response.status === 429) setBuilderStatus('Too many introductions at once. Please try again in a few minutes.');
+    else if (response.status === 400) setBuilderStatus(`Please check ${builderFieldLabels[result.field] || 'the form'} and send again.`);
+    else if (response.status === 403) setBuilderStatus('The security check did not pass. Please try again.');
+    else setBuilderStatus('Something went wrong on our side. Please try again later, or email hello@xasis.app.');
+    return;
+  }
   const summary = document.getElementById('builder-summary');
-  summary.textContent = `${builderProfile.name}, your profile brings together your focus on ${builderProfile.specialty.toLowerCase()}, your working example and your availability.`;
+  summary.textContent = `${builderProfile.name}, thanks for introducing your work on ${builderProfile.specialty.toLowerCase()}.`;
   const profile = document.getElementById('builder-profile');
   profile.replaceChildren();
   [
-    ['Name', builderProfile.name.trim()],
-    ['Email', builderProfile.email.trim()],
+    ['Name', builderProfile.name],
+    ['Email', builderProfile.email],
+    ['Based in', `${builderProfile.country} (${builderProfile.utc_offset})`],
     ['Main strength', builderProfile.specialty],
-    ['Relevant example', builderProfile.example.trim()],
-    ['Link to work', builderProfile.portfolio.trim() || 'Not supplied'],
+    ['Relevant example', builderProfile.example],
+    ['Link to work', builderProfile.portfolio || 'Not supplied'],
     ['Availability', builderProfile.availability]
   ].forEach(([label, value]) => {
     const row = element('div');
     row.append(element('dt', '', label), element('dd', '', value));
     profile.append(row);
   });
+  builderForm.reset();
   builderForm.hidden = true;
   builderSuccess.hidden = false;
   builderSuccess.focus({preventScroll: true});
   builderSuccess.scrollIntoView({block: 'start', behavior: 'instant'});
 });
-document.getElementById('edit-introduction')?.addEventListener('click', () => {
-  builderSuccess.hidden = true;
-  builderForm.hidden = false;
-  document.getElementById('builder-name').focus({preventScroll: true});
-  builderForm.scrollIntoView({block: 'start', behavior: 'instant'});
-});
 document.getElementById('download-introduction')?.addEventListener('click', () => {
   if (!builderProfile) return;
   const content = [
     'XASIS / BUILDER INTRODUCTION',
-    'Prepared locally, ready to share. No project assignment is implied.', '',
+    'Sent to XASIS. No project assignment is implied.', '',
     'NAME', builderProfile.name.trim(), '',
     'EMAIL', builderProfile.email.trim(), '',
+    'BASED IN', `${builderProfile.country} (${builderProfile.utc_offset})`, '',
     'MAIN STRENGTH', builderProfile.specialty, '',
     'RELEVANT EXAMPLE', builderProfile.example.trim(), '',
     'LINK TO WORK', builderProfile.portfolio.trim() || 'Not supplied', '',
     'AVAILABILITY', builderProfile.availability, '',
     'FOR A PROJECT CONVERSATION',
     'Discuss the business job, working example, constraints, scope, availability, handover and commercial terms.', '',
-    'Send this introduction to hello@xasis.app.'
+    'Questions? Email hello@xasis.app.'
   ];
   downloadText('xasis-builder-introduction.txt', content.join('\n'));
-  notify('Your builder introduction is ready to save.');
+  notify('Your copy is ready to save.');
 });
