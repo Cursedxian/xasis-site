@@ -40,7 +40,7 @@
         <button class="xc-send" type="submit" aria-label="Send">${ICON_SEND}</button>
       </form>
       <div class="xc-foot">
-        <a class="xc-cta" href="/contact.html#project-form">Book a free check</a>
+        <div class="xc-actions"><a class="xc-cta" href="/contact.html#project-form">Book a free check</a><a class="xc-cta xc-wa" href="https://wa.me/6589950717" target="_blank" rel="noopener">WhatsApp us</a></div>
         <p>Please do not share personal details. Messages are processed by Google. <a href="/privacy.html#chat">Privacy</a> <span aria-hidden="true">·</span> <button class="xc-reset" type="button">New chat</button></p>
       </div>
     </section>`;

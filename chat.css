@@ -29,6 +29,9 @@
 .xc-foot{padding:0 12px 12px}
 .xc-cta{display:flex;align-items:center;justify-content:center;min-height:42px;border-radius:99px;background:var(--ink,#161d22);color:#fff;font-size:11px;font-weight:650;letter-spacing:.04em;text-transform:uppercase}
 .xc-cta:hover{background:#303a40}
+.xc-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.xc-wa{background:#fff;color:var(--ink,#161d22);border:1px solid var(--ink,#161d22)}
+.xc-wa:hover{background:var(--warm,#f7f7f5)}
 .xc-foot p{margin-top:8px;font-size:10.5px;line-height:1.5;color:var(--body,#515c63);text-align:center}
 .xc-foot p a,.xc-reset{color:var(--ink,#161d22);text-decoration:underline;font-size:inherit;padding:0}
 @media(max-width:600px){
@@ -39,3 +42,5 @@
   .xc-form textarea{font-size:16px}
 }
 @media(prefers-reduced-motion:reduce){.xc-typing:after{animation:none;width:auto}}
+/* Room under the footer so the chat bubble never covers footer links. */
+.site-footer{padding-bottom:84px}

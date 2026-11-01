@@ -73,3 +73,6 @@ body[data-page=index] .hero-photo:after{content:'';position:absolute;inset:0;z-i
 .team-profile-link{display:block;color:var(--ink);min-height:60px}.team-profile-link>span{display:inline-flex;align-items:center;gap:5px;font-size:11px;line-height:1.6;color:var(--body);margin-top:10px}.team-profile-link:hover>span{text-decoration:underline;text-underline-offset:4px}.team-profile-link .icon{width:13px;height:13px;flex-shrink:0}
 
 .hp-field{position:absolute!important;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden}.turnstile-holder{margin:4px 0 14px;min-height:65px}
+
+/* Footer: email and WhatsApp each on their own line. */
+.footer-brand .email-link{display:flex;width:max-content}
