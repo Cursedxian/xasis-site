@@ -1,0 +1,41 @@
+/* XASIS website assistant (chat.js). Uses the site tokens from styles.css. */
+.xc{position:fixed;right:24px;bottom:24px;z-index:90;font-family:var(--font,Inter,Arial,sans-serif)}
+.xc-launch{display:inline-flex;align-items:center;gap:10px;min-height:52px;padding:0 22px 0 18px;border-radius:99px;background:var(--orange,#ff4d00);color:#fff;font-size:13px;font-weight:650;letter-spacing:-.01em;box-shadow:0 6px 22px #ff4d0040,0 2px 6px #0002;transition:background .2s,translate .2s}
+.xc-launch:hover{background:var(--orange-hover,#dc4200);translate:0 -1px}
+.xc.is-open .xc-launch{display:none}
+.xc-panel{position:absolute;right:0;bottom:0;width:370px;height:min(560px,calc(100vh - 48px));display:flex;flex-direction:column;background:#fff;border:1px solid var(--border,#e3e5e3);border-radius:12px;box-shadow:0 18px 50px #161d2230;overflow:hidden}
+.xc-panel[hidden]{display:none!important}
+.xc-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 12px 14px 18px;background:var(--ink,#161d22);color:#fff}
+.xc-head strong{display:block;font-size:14px;letter-spacing:-.02em}
+.xc-head small{display:block;font-size:11px;color:#c9cfd2;margin-top:2px}
+.xc-close{width:40px;height:40px;display:grid;place-items:center;color:#fff;border-radius:8px}
+.xc-close:hover{background:#ffffff1a}
+.xc-log{flex:1;overflow-y:auto;padding:16px 14px 6px;display:flex;flex-direction:column;gap:9px;background:var(--warm,#f7f7f5)}
+.xc-msg{max-width:86%;padding:10px 13px;border-radius:12px;font-size:13.5px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
+.xc-bot{align-self:flex-start;background:#fff;color:var(--ink,#161d22);border:1px solid var(--border,#e3e5e3);border-bottom-left-radius:4px}
+.xc-user{align-self:flex-end;background:var(--orange,#ff4d00);color:#fff;border-bottom-right-radius:4px}
+.xc-error{background:var(--pale-orange,#fff0e8);border-color:#ffd2bd}
+.xc-typing{color:var(--body,#515c63);font-style:italic}
+.xc-typing:after{content:'...';display:inline-block;width:1.2em;animation:xc-dots 1.2s steps(4,end) infinite;overflow:hidden;vertical-align:bottom}
+@keyframes xc-dots{0%{width:0}100%{width:1.2em}}
+.xc-starters{display:flex;flex-wrap:wrap;gap:7px;padding:4px 14px 10px;background:var(--warm,#f7f7f5)}
+.xc-starter{min-height:36px;padding:7px 12px;border:1px solid var(--orange,#ff4d00);border-radius:99px;background:#fff;color:#b33600;font-size:12px;font-weight:600;line-height:1.3;text-align:left}
+.xc-starter:hover{background:var(--pale-orange,#fff0e8)}
+.xc-form{display:flex;align-items:flex-end;gap:8px;padding:10px 12px;border-top:1px solid var(--border,#e3e5e3)}
+.xc-form textarea{flex:1;resize:none;min-height:44px;max-height:110px;padding:11px 12px;border:1px solid #cfd3d0;border-radius:8px;font-size:14px;line-height:1.45;color:var(--ink,#161d22);background:#fff}
+.xc-form textarea:focus{outline:2px solid var(--orange,#ff4d00);outline-offset:0;border-color:transparent}
+.xc-send{flex-shrink:0;width:44px;height:44px;display:grid;place-items:center;border-radius:50%;background:var(--orange,#ff4d00);color:#fff}
+.xc-send:disabled{opacity:.5;cursor:wait}
+.xc-foot{padding:0 12px 12px}
+.xc-cta{display:flex;align-items:center;justify-content:center;min-height:42px;border-radius:99px;background:var(--ink,#161d22);color:#fff;font-size:11px;font-weight:650;letter-spacing:.04em;text-transform:uppercase}
+.xc-cta:hover{background:#303a40}
+.xc-foot p{margin-top:8px;font-size:10.5px;line-height:1.5;color:var(--body,#515c63);text-align:center}
+.xc-foot p a,.xc-reset{color:var(--ink,#161d22);text-decoration:underline;font-size:inherit;padding:0}
+@media(max-width:600px){
+  .xc{right:14px;bottom:14px}
+  .xc-launch{width:56px;height:56px;padding:0;justify-content:center}
+  .xc-launch span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+  .xc-panel{position:fixed;inset:auto 0 0 0;width:100%;height:min(88vh,100dvh);border-radius:14px 14px 0 0}
+  .xc-form textarea{font-size:16px}
+}
+@media(prefers-reduced-motion:reduce){.xc-typing:after{animation:none;width:auto}}
