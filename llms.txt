@@ -1,0 +1,18 @@
+# XASIS
+> Singapore web studio (ZX, Ryan and Ziren) that builds cinematic websites for businesses from the photos and reviews they already have, then helps Google and AI tools like ChatGPT understand them.
+
+Contact: hello@xasis.app · WhatsApp +65 8995 0717 · Mon to Sun 9:00 AM to 6:00 PM · Singapore
+Start: a free check of your website and Google Business Profile (https://xasis.app/contact.html)
+
+## Services
+- [Website Upgrade](https://xasis.app/services.html#website-upgrade): rebuild of your current site from your existing photos, reviews and projects, with one scroll moment that feels like a film.
+- [SEO + Digital PR](https://xasis.app/services.html#seo-pr): SEO for Google, Maps and AI answers plus digital PR (mentions and links on trusted Singapore sites). Builds lasting visibility instead of paying per click. No guaranteed rankings.
+- [AI WhatsApp Assistant](https://xasis.app/services.html#assistant): AI first reply to common WhatsApp questions with a handover to your team.
+
+## Pages
+- [Home](https://xasis.app/)
+- [Services and FAQ](https://xasis.app/services.html)
+- [Concept work](https://xasis.app/work.html)
+- [About](https://xasis.app/about.html)
+- [Book a free check](https://xasis.app/contact.html)
+- [Privacy notice](https://xasis.app/privacy.html)

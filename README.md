@@ -1,4 +1,12 @@
-# XASIS: Midnight Studio website
+# XASIS website (v4, cinematic)
+
+Studio site for XASIS: cinematic websites for any business, SEO + Digital PR and an AI WhatsApp Assistant.
+Plain HTML, CSS and JavaScript (GSAP + Lenis from jsDelivr), no build step.
+
+- v4 (Nov 2026): sunset-sky scroll hero into a laptop with five industry films, "Be the answer" search/AI section,
+  sky colour flow background, booking picker on the contact page. Source of truth: Knowledge Base `website_demos/xasis/site/`.
+- The previous interior-design version is kept in branch `backup/v3-interior-design` and tag `v3-interior-design-2026-11-12`.
+
 
 Public prospect website and clearly labelled interactive workspace demo, built from ZX's selected Midnight Studio design boards. Uses plain HTML, CSS and JavaScript with locally hosted fonts and original generated PNGs.
 

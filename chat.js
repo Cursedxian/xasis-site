@@ -7,7 +7,7 @@
   const STORE = 'xasis-chat-v1';
   const WINDOW = 11;
   const MAX_LEN = 500;
-  const GREETING = 'Hi! I am the XASIS assistant. Ask me anything about our website, AI search and WhatsApp assistant services for interior design firms.';
+  const GREETING = 'Hi! I am the XASIS assistant. Ask me anything about our websites, AI search setup and WhatsApp assistant for Singapore businesses.';
   const STARTERS = ['What does XASIS do?', 'How much does it cost?', 'How does the free check work?'];
   const ICON_CHAT = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11.5a8 8 0 0 1-11.8 7L4 20l1.5-4.2A8 8 0 1 1 20 11.5Z"/></svg>';
   const ICON_CLOSE = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6"/></svg>';

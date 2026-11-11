@@ -1,0 +1,171 @@
+/* "Where customers find you": Google, Maps, ChatGPT, Gemini, Claude and digital PR, each shown with the business coming up first.
+   Generic look-alike screens (no real logos), clearly labelled as examples. */
+.find{background:var(--paper)}
+.find-head{display:grid;grid-template-columns:1.1fr 1fr;gap:48px;align-items:end;margin-bottom:clamp(36px,4.5vw,64px)}
+.find-tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px}
+.find-tabs button{min-height:44px;padding:0 18px;border-radius:99px;border:1px solid var(--line);background:#fff;color:var(--ink);font:500 15px/1 var(--font);cursor:pointer;
+  position:relative;overflow:hidden;transition:background .3s,color .3s,border-color .3s}
+.find-tabs button[aria-selected=true]{background:var(--ink);border-color:var(--ink);color:#fff}
+.find-tabs button i{position:absolute;left:0;bottom:0;height:2px;width:100%;background:var(--orange);transform-origin:left;transform:scaleX(0)}
+.find-tabs button[aria-selected=true] i{animation:findbar var(--dur,7s) linear forwards}
+.find-paused .find-tabs button i{animation-play-state:paused}
+@keyframes findbar{to{transform:scaleX(1)}}
+.find-stage{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(24px,4vw,64px);align-items:center}
+.find-copy{position:relative;min-height:230px}
+.find-copy>div{position:absolute;inset:0 0 auto;opacity:0;transform:translateY(14px);transition:opacity .45s var(--ease),transform .55s var(--ease);pointer-events:none}
+.find-copy>div.on{opacity:1;transform:none;pointer-events:auto}
+.find-copy h3{font-size:clamp(26px,2.4vw,36px);letter-spacing:-.035em;margin-bottom:14px}
+.find-copy p{font-size:clamp(17px,1.3vw,19px)}
+.find-copy .find-why{display:block;margin-top:16px;font-weight:600;color:var(--ink)}
+.screen{position:relative;border-radius:22px;background:#fff;box-shadow:0 40px 80px -40px rgba(22,29,34,.35),0 0 0 1px var(--line);overflow:hidden;aspect-ratio:16/11}
+.screen .pane{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity .4s}
+.screen .pane.on{opacity:1;visibility:visible}
+.ex-tag{display:none;position:absolute;right:14px;bottom:12px;z-index:5;font-size:13px;color:var(--muted);background:rgba(255,255,255,.9);padding:4px 8px;border-radius:6px}
+
+/* shared bits */
+.bar-top{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--line)}
+.bar-top b{font:700 16px/1 var(--font);letter-spacing:-.02em;color:var(--ink)}
+.qbox{flex:1;display:flex;align-items:center;gap:10px;min-height:42px;padding:0 16px;border-radius:99px;border:1px solid #dfe1e5;font-size:15px;color:var(--ink)}
+.qbox svg{width:16px;height:16px;flex:none;color:#80868b}
+.caret{display:inline-block;width:1.5px;height:1.05em;background:var(--ink);vertical-align:-2px;margin-left:1px;animation:findblink 1s steps(1) infinite}
+@keyframes findblink{50%{opacity:0}}
+.you{position:relative}
+.you::before{content:"";position:absolute;inset:-8px -10px;border-radius:12px;border:1.5px solid var(--orange);background:rgba(255,77,0,.05);opacity:0;transform:scale(.97);transition:opacity .5s,transform .5s var(--ease)}
+.you.lit::before{opacity:1;transform:none}
+.you-pin{display:inline-block;margin-left:8px;font:600 12px/1 var(--font);color:#fff;background:var(--orange);padding:5px 7px;border-radius:5px;vertical-align:2px}
+.ghost-line{display:block;height:9px;border-radius:9px;background:#e8eae8;margin:7px 0}
+.reveal-row{opacity:0;transform:translateY(10px);transition:opacity .45s var(--ease),transform .55s var(--ease)}
+.reveal-row.in{opacity:1;transform:none}
+
+/* Google results */
+.g-res{padding:16px 22px 18px 22px;display:flex;flex-direction:column;gap:16px;font-family:Arial,var(--font)}
+.g-item small{display:block;font-size:12.5px;color:#4d5156}
+.g-item a{display:block;font-size:19px;line-height:1.25;color:#1a0dab;text-decoration:none;margin:3px 0}
+.g-item p{font-size:13.5px;line-height:1.45;color:#4d5156}
+.g-item .stars{color:#e7711b;font-size:13px}
+.g-ad small b{font-weight:700;color:var(--ink)}
+.g-ad{opacity:.55}
+
+/* Maps pack */
+.m-wrap{display:grid;grid-template-columns:1.05fr 1fr;height:calc(100% - 71px)}
+.m-map{position:relative;background:#e9efe6;overflow:hidden}
+.m-map::before{content:"";position:absolute;inset:0;background:
+  linear-gradient(90deg,transparent 46%,#fff 46% 49%,transparent 49%),linear-gradient(0deg,transparent 58%,#fff 58% 61%,transparent 61%),
+  linear-gradient(35deg,transparent 30%,#f7f3e8 30% 34%,transparent 34%),radial-gradient(40% 30% at 75% 25%,#cfe3c8,transparent 70%),radial-gradient(30% 25% at 20% 80%,#cde0f5,transparent 70%)}
+.pin{position:absolute;width:26px;height:26px;border-radius:50% 50% 50% 0;transform:rotate(-45deg) translateY(-12px);background:#9aa0a6;opacity:0;transition:opacity .4s,transform .5s var(--ease)}
+.pin.in{opacity:1;transform:rotate(-45deg)}
+.pin.me{background:var(--orange);width:34px;height:34px;box-shadow:0 8px 18px -6px rgba(0,0,0,.35)}
+.pin::after{content:"";position:absolute;inset:8px;border-radius:50%;background:#fff}
+.pin.me::after{inset:10px}
+.m-list{padding:14px 18px;display:flex;flex-direction:column;gap:12px;font-family:Arial,var(--font)}
+.m-card{padding:10px 12px;border-radius:10px}
+.m-card b{display:block;font-size:15px;color:var(--ink)}
+.m-card span{font-size:12.5px;color:#4d5156}
+
+/* AI chats (generic, no real logos) */
+.chat-ui{display:flex;flex-direction:column;height:100%}
+.chat-ui .bar-top b{font-weight:600}
+.chat-ui .bar-top small{margin-left:auto;font-size:12.5px;color:var(--muted)}
+.composer{margin:0 18px 16px;min-height:46px;border-radius:16px;border:1px solid var(--line);display:flex;align-items:center;padding:0 8px 0 16px;font-size:14px;color:var(--muted);background:#fff}
+.composer i{margin-left:auto;width:30px;height:30px;border-radius:50%;background:var(--ink);opacity:.85}
+.tone-cl .composer i{background:#c96442}
+.tone-gem .composer{border-radius:99px}
+.chat-body{flex:1;padding:18px 22px;display:flex;flex-direction:column;gap:14px;overflow:hidden}
+.q-bub{align-self:flex-end;max-width:78%;padding:11px 15px;border-radius:18px;font-size:15px;line-height:1.4;color:var(--ink);background:#f0f1f2}
+.a-bub{font-size:15px;line-height:1.55;color:var(--ink);max-width:94%}
+.a-bub p{margin:0 0 8px}
+.a-bub strong{font-weight:700}
+.a-bub ol{margin:4px 0 8px;padding-left:20px}
+.a-bub li{margin:4px 0}
+.cites{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.cites span{font-size:12px;padding:5px 9px;border-radius:99px;border:1px solid var(--line);color:var(--muted);background:#fff}
+.tone-gpt .chat-body{background:#fff}
+.tone-gem .chat-body{background:linear-gradient(180deg,#f7f9ff,#fff 40%)}
+.tone-gem .q-bub{background:#e9eefc}
+.tone-cl .chat-body{background:#faf8f3}
+.tone-cl .q-bub{background:#efe9dd}
+.tone-cl .a-bub{font-family:Georgia,'Times New Roman',serif;font-size:16px}
+
+/* Digital PR: mentions feed the business, which feeds search + AI */
+.pr{position:relative;height:100%;padding:22px}
+.pr svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.pr svg path{fill:none;stroke:var(--orange);stroke-width:1.6;stroke-linecap:round;stroke-dasharray:3 6;vector-effect:non-scaling-stroke;opacity:0;transition:opacity .4s}
+.pr svg path.in{opacity:1;animation:prflow 1.2s linear infinite}
+@keyframes prflow{to{stroke-dashoffset:-18}}
+.pr-col{position:absolute;display:flex;flex-direction:column;gap:12px}
+.pr-src{left:4%;top:9%;width:36%}
+.pr-art{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:0 10px 24px -18px rgba(0,0,0,.4)}
+.pr-art small{display:block;font-size:11.5px;font-weight:600;color:var(--orange-text);margin-bottom:5px}
+.pr-art b{display:block;font-size:13.5px;line-height:1.35;color:var(--ink)}
+.pr-hub{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(.9);opacity:0;width:24%;min-width:130px;text-align:center;padding:16px 12px;border-radius:16px;background:var(--orange);color:#fff;
+  font:600 15px/1.25 var(--font);transition:opacity .5s,transform .6s var(--ease)}
+.pr-hub.in{opacity:1;transform:translate(-50%,-50%)}
+.pr-out{right:4%;top:22%;width:24%}
+.pr-out div{padding:12px;border-radius:12px;background:var(--ink);color:#fff;font:600 14px/1.3 var(--font);text-align:center}
+
+@media (max-width:960px){
+  .find-head,.find-stage{grid-template-columns:1fr}
+  .find-copy{min-height:200px}
+  .screen{aspect-ratio:4/4.4}
+  .m-wrap{grid-template-columns:1fr;grid-template-rows:38% 1fr}
+  .pr-src{width:44%}.pr-out{width:28%}
+}
+@media (max-width:600px){
+  .find-tabs{flex-wrap:nowrap;overflow-x:auto;margin:0 calc(var(--pad)*-1) 18px;padding:0 var(--pad);scrollbar-width:none}
+  .find-tabs button{flex:none}
+  .g-item a{font-size:17px}
+  .screen{aspect-ratio:4/5.2}
+  .pr-src{left:4%;width:56%}.pr-out{right:4%;top:auto;bottom:4%;width:52%;flex-direction:row;gap:6px}
+  .pr-out div{font-size:12px;padding:9px 6px}
+  .pr-hub{left:70%;top:34%}
+}
+@media (prefers-reduced-motion:reduce){
+  .find-tabs button i{animation:none!important}
+  .reveal-row,.pin,.pr-hub{opacity:1!important;transform:none!important;transition:none!important}
+}
+
+/* tab hint + always-visible digital PR diagram */
+.find-hint{font-size:15px;font-weight:500;color:var(--muted);margin:0 0 12px}
+.prs{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.6fr);gap:clamp(24px,4vw,64px);align-items:center;margin-top:clamp(56px,7vw,96px);
+  padding-top:clamp(40px,5vw,64px);border-top:1px solid rgba(22,29,34,.1)}
+.prs-copy h3{font-size:clamp(26px,2.4vw,36px);letter-spacing:-.035em;margin-bottom:14px}
+.prs-copy p{font-size:clamp(17px,1.3vw,19px)}
+.prs-copy .find-why{display:block;margin-top:16px;font-weight:600;color:var(--ink)}
+.prs-flow{display:grid;grid-template-columns:minmax(0,1.25fr) 48px minmax(0,.8fr) 48px minmax(0,1fr);align-items:center;gap:10px}
+.prs-col{display:flex;flex-direction:column;gap:12px}
+.prs-arrow{position:relative;height:2px;background:var(--orange)}
+.prs-arrow::after{content:"";position:absolute;right:-1px;top:-5px;border:6px solid transparent;border-left:9px solid var(--orange);border-right:0}
+.prs-hub{padding:20px 14px;border-radius:18px;background:var(--orange);color:#fff;text-align:center;font:600 18px/1.2 var(--font);letter-spacing:-.02em;
+  box-shadow:0 18px 36px -20px rgba(22,29,34,.45)}
+.prs-hub small{display:block;margin-top:6px;font:500 13px/1.3 var(--font);opacity:.9;letter-spacing:0}
+.prs-out div{padding:13px 14px;border-radius:12px;background:var(--ink);color:#fff;font:500 15px/1.3 var(--font)}
+.prs-out b{color:#ffb38f;font-weight:600}
+@media (max-width:960px){
+  .prs{grid-template-columns:1fr}
+}
+@media (max-width:600px){
+  .prs-flow{grid-template-columns:1fr;gap:14px}
+  .prs-arrow{width:2px;height:28px;justify-self:center}
+  .prs-arrow::after{right:auto;left:-5px;top:auto;bottom:-1px;border:6px solid transparent;border-top:9px solid var(--orange);border-bottom:0}
+}
+
+/* make the tabs ask to be tapped: bigger hint with a bouncing arrow, bigger tabs that pulse until someone taps one */
+.find-hint{display:flex;align-items:center;gap:10px;font:600 clamp(18px,1.5vw,21px)/1.3 var(--font);color:var(--ink);margin:0 0 16px}
+.find-arrow{width:24px;height:24px;flex:none;color:var(--orange);animation:findbob 1.2s var(--ease) infinite}
+@keyframes findbob{0%,100%{transform:translateY(-3px)}50%{transform:translateY(4px)}}
+.find-tabs{gap:10px}
+.find-tabs button{min-height:52px;padding:0 22px;font-size:17px;font-weight:600;box-shadow:0 2px 0 rgba(22,29,34,.06)}
+.find-tabs button:hover{border-color:var(--orange);color:var(--orange-text);transform:translateY(-2px)}
+.find-tabs button{transition:background .3s,color .3s,border-color .3s,transform .25s var(--ease)}
+#find:not(.find-used) .find-tabs button[aria-selected=false]{animation:findpulse 2.4s var(--ease) infinite}
+#find:not(.find-used) .find-tabs button[aria-selected=false]:nth-child(2){animation-delay:.3s}
+#find:not(.find-used) .find-tabs button[aria-selected=false]:nth-child(3){animation-delay:.6s}
+#find:not(.find-used) .find-tabs button[aria-selected=false]:nth-child(4){animation-delay:.9s}
+#find:not(.find-used) .find-tabs button[aria-selected=false]:nth-child(5){animation-delay:1.2s}
+@keyframes findpulse{0%{box-shadow:0 0 0 0 rgba(255,77,0,.45)}70%{box-shadow:0 0 0 10px rgba(255,77,0,0)}100%{box-shadow:0 0 0 0 rgba(255,77,0,0)}}
+@media (max-width:600px){.find-tabs button{min-height:48px;padding:0 18px;font-size:16px}}
+@media (prefers-reduced-motion:reduce){.find-arrow,#find .find-tabs button{animation:none!important}}
+/* contrast fixes: ink text on the orange hub, selected tab stays white on hover */
+.prs-hub{color:var(--ink)}
+.prs-hub small{opacity:1;color:var(--ink)}
+.find-tabs button[aria-selected=true]:hover{color:#fff;border-color:var(--ink)}

@@ -1,6 +1,6 @@
 /* XASIS website assistant (chat.js). Uses the site tokens from styles.css. */
 .xc{position:fixed;right:24px;bottom:24px;z-index:90;font-family:var(--font,Inter,Arial,sans-serif)}
-.xc-launch{display:inline-flex;align-items:center;gap:10px;min-height:52px;padding:0 22px 0 18px;border-radius:99px;background:var(--orange,#ff4d00);color:#fff;font-size:13px;font-weight:650;letter-spacing:-.01em;box-shadow:0 6px 22px #ff4d0040,0 2px 6px #0002;transition:background .2s,translate .2s}
+.xc-launch{display:inline-flex;align-items:center;gap:10px;min-height:52px;padding:0 22px 0 18px;border-radius:99px;background:var(--orange,#ff4d00);color:#fff;font-size:13px;font-weight:650;letter-spacing:-.01em;box-shadow:0 6px 22px rgba(22,29,34,.22),0 2px 6px rgba(0,0,0,.12);transition:background .2s,translate .2s}
 .xc-launch:hover{background:var(--orange-hover,#dc4200);translate:0 -1px}
 .xc.is-open .xc-launch{display:none}
 .xc-panel{position:absolute;right:0;bottom:0;width:370px;height:min(560px,calc(100vh - 48px));display:flex;flex-direction:column;background:#fff;border:1px solid var(--border,#e3e5e3);border-radius:12px;box-shadow:0 18px 50px #161d2230;overflow:hidden}
