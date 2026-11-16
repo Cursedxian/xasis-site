@@ -1,0 +1,69 @@
+# Keeps search engines up to date every time the website changes.
+#
+# On every push:        run the tests and rebuild sitemap.xml (branches: show the result only).
+# On a push to main:    also save the new sitemap.xml, wait for GitHub Pages to publish,
+#                       then tell IndexNow (Bing, Yandex, Naver, Seznam, Yep) which pages changed.
+# Google does not use IndexNow; it re-reads sitemap.xml on its own.
+#
+# Scripts live in scripts/. Run the tests locally with: python scripts/test_seo_scripts.py
+
+name: Search engines
+
+on:
+  push:
+    paths-ignore:
+      - sitemap.xml   # the bot's own sitemap commit must not start another run
+  workflow_dispatch:  # "Run workflow" button: resends every page to IndexNow
+
+permissions:
+  contents: write     # save sitemap.xml back to main
+  pages: write        # ask GitHub Pages to publish after that save
+
+concurrency:
+  group: search-engines-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # full history, so each page's date comes from its last commit
+
+      - name: Test the scripts
+        run: python3 scripts/test_seo_scripts.py
+
+      - name: Rebuild sitemap.xml
+        run: python3 scripts/build_sitemap.py --llms
+
+      - name: Show the sitemap (test branches only, nothing is saved)
+        if: github.ref != 'refs/heads/main'
+        run: |
+          git diff --stat sitemap.xml || true
+          cat sitemap.xml
+
+      - name: Save sitemap.xml to main
+        if: github.ref == 'refs/heads/main'
+        run: |
+          if git diff --quiet -- sitemap.xml; then
+            echo "sitemap.xml already up to date"
+            exit 0
+          fi
+          git config user.name "xasis-seo-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add sitemap.xml
+          git commit -m "chore(seo): update sitemap.xml"
+          git pull --rebase origin main
+          git push origin HEAD:main
+          # Pushes made by the workflow token may not trigger a Pages build, so ask for one.
+          curl -fsS -X POST \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/pages/builds" \
+            || echo "::warning::could not request a Pages build; the next site update will publish the sitemap"
+
+      - name: Tell IndexNow which pages changed
+        if: github.ref == 'refs/heads/main'
+        run: python3 scripts/indexnow.py --before "${{ github.event.before }}" --after HEAD

@@ -7,6 +7,21 @@ Plain HTML, CSS and JavaScript (GSAP + Lenis from jsDelivr), no build step.
   sky colour flow background, booking picker on the contact page. Source of truth: Knowledge Base `website_demos/xasis/site/`.
 - The previous interior-design version is kept in branch `backup/v3-interior-design` and tag `v3-interior-design-2026-11-12`.
 
+## Search engines (automatic)
+
+Every push to `main` runs `.github/workflows/search-engines.yml`:
+
+1. Rebuilds `sitemap.xml` from the pages (`scripts/build_sitemap.py`). A page is listed unless it has
+   `<meta name="robots" content="noindex">`; `404.html` is never listed. Each date is the page's last commit.
+   Do not edit `sitemap.xml` by hand.
+2. Saves the new sitemap to `main` as a bot commit, so **run `git pull` before editing**.
+3. Tells IndexNow (Bing, Yandex, Naver, Seznam, Yep) which public pages changed (`scripts/indexnow.py`).
+   Google re-reads `sitemap.xml` by itself.
+
+To add a new page or blog post: add the `.html` file with `index,follow`, link it in `llms.txt`, push. Nothing else.
+Keep `64a02b548690b5361e3e5d3bbdc31338.txt` at the root: it is the public IndexNow key (not a secret).
+Tests: `python scripts/test_seo_scripts.py`.
+
 
 Public prospect website and clearly labelled interactive workspace demo, built from ZX's selected Midnight Studio design boards. Uses plain HTML, CSS and JavaScript with locally hosted fonts and original generated PNGs.
 
